@@ -40,8 +40,8 @@
 #ifndef _SYS_SIGNAL_H_
 #define	_SYS_SIGNAL_H_
 
+#include <sys/signal.h>
 #include <sys/cdefs.h>
-#include <sys/_types.h>
 #include <sys/_sigset.h>
 
 #include <machine/_limits.h>	/* __MINSIGSTKSZ */

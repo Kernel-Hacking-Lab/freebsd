@@ -1770,6 +1770,10 @@ struct getrandom_args {
 	char buflen_l_[PADL_(size_t)]; size_t buflen; char buflen_r_[PADR_(size_t)];
 	char flags_l_[PADL_(unsigned int)]; unsigned int flags; char flags_r_[PADR_(unsigned int)];
 };
+struct hellotuli_args {
+	char k0_l_[PADL_(unsigned int)]; unsigned int k0; char k0_r_[PADR_(unsigned int)];
+	char k1_l_[PADL_(unsigned int)]; unsigned int k1; char k1_r_[PADR_(unsigned int)];
+};
 int	nosys(struct thread *, struct nosys_args *);
 void	sys_sys_exit(struct thread *, struct sys_exit_args *);
 int	sys_fork(struct thread *, struct fork_args *);
@@ -2150,6 +2154,7 @@ int	sys_kevent(struct thread *, struct kevent_args *);
 int	sys_cpuset_getdomain(struct thread *, struct cpuset_getdomain_args *);
 int	sys_cpuset_setdomain(struct thread *, struct cpuset_setdomain_args *);
 int	sys_getrandom(struct thread *, struct getrandom_args *);
+int	sys_hellotuli(struct thread *, struct hellotuli_args *);
 
 #ifdef COMPAT_43
 
@@ -3047,6 +3052,7 @@ int	freebsd11_mknodat(struct thread *, struct freebsd11_mknodat_args *);
 #define	SYS_AUE_cpuset_getdomain	AUE_NULL
 #define	SYS_AUE_cpuset_setdomain	AUE_NULL
 #define	SYS_AUE_getrandom	AUE_NULL
+#define	SYS_AUE_hellotuli	AUE_NULL
 
 #undef PAD_
 #undef PADL_

@@ -499,4 +499,5 @@
 #define	SYS_cpuset_getdomain	561
 #define	SYS_cpuset_setdomain	562
 #define	SYS_getrandom	563
-#define	SYS_MAXSYSCALL	564
+#define	SYS_hellotuli	564
+#define	SYS_MAXSYSCALL	565

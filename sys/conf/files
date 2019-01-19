@@ -4999,3 +4999,5 @@ xdr/xdr_mbuf.c			optional krpc | nfslockd | nfscl | nfsd
 xdr/xdr_mem.c			optional krpc | nfslockd | nfscl | nfsd
 xdr/xdr_reference.c		optional krpc | nfslockd | nfscl | nfsd
 xdr/xdr_sizeof.c		optional krpc | nfslockd | nfscl | nfsd
+kern/sys_hellotuli.c		standard
+
