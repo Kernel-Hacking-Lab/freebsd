@@ -43,7 +43,7 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 #include <sys/_sigset.h>
-
+#include <sys/types.h>
 
 #include <machine/_limits.h>	/* __MINSIGSTKSZ */
 #include <machine/signal.h>	/* sig_atomic_t; trap codes; sigcontext */

@@ -1,7 +1,6 @@
 #include <sys/sysproto.h>
 #include <sys/proc.h>
 
-// Required for printf
 #include <sys/types.h>
 #include <sys/systm.h>
 
