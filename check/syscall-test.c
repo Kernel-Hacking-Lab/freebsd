@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 int main(){
-	syscall(564, 0, 0);
+	syscall(SYS_hellotuli, 0, 0);
 	return 0;
 }
 
