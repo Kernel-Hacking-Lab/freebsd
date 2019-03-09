@@ -262,7 +262,8 @@ vm_pageout_end_scan(struct scan_state *ss)
  * not be disassociated from the queue.
  * 
  * Tuli - Jain : While collecting batch prefer batch that is preferable as per
- * the Minimal Counting bloom filter (low frequency and clean pages)
+ * the Minimal Counting bloom filter (low frequency and clean pages). So
+ * TAIL_Q can be converted from normal queue to priority queue
  */
 static __always_inline void
 vm_pageout_collect_batch(struct scan_state *ss, const bool dequeue)
