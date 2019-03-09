@@ -213,7 +213,7 @@ struct vm_page {
 	int8_t segind;			/* vm_phys segment index (C) */
 	uint8_t	order;			/* index of the buddy queue (F) */
 	uint8_t pool;			/* vm_phys freepool index (F) */
-	u_char	act_count;		/* page usage count (P) */
+	u_char	act_count;		/* page usage count (P) : Important : Tuli - Jain */
 	/* NOTE that these must support one bit per DEV_BSIZE in a page */
 	/* so, on normal X86 kernels, they must be at least 8 bits wide */
 	vm_page_bits_t valid;		/* map of valid DEV_BSIZE chunks (O) */

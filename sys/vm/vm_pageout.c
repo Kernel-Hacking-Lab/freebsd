@@ -178,7 +178,7 @@ SYSCTL_INT(_vm, OID_AUTO, pageout_oom_seq,
 	CTLFLAG_RWTUN, &vm_pageout_oom_seq, 0,
 	"back-to-back calls to oom detector to start OOM");
 
-static int act_scan_laundry_weight = 3;
+static int act_scan_laundry_weight = 3; // Tuli - Jain : Tinkering this laundry scan weight can help
 SYSCTL_INT(_vm, OID_AUTO, act_scan_laundry_weight, CTLFLAG_RWTUN,
     &act_scan_laundry_weight, 0,
     "weight given to clean vs. dirty pages in active queue scans");
@@ -260,6 +260,9 @@ vm_pageout_end_scan(struct scan_state *ss)
  * determine whether the page has been logically dequeued by another thread.
  * Once this check is performed, the page lock guarantees that the page will
  * not be disassociated from the queue.
+ * 
+ * Tuli - Jain : While collecting batch prefer batch that is preferable as per
+ * the Minimal Counting bloom filter (low frequency and clean pages)
  */
 static __always_inline void
 vm_pageout_collect_batch(struct scan_state *ss, const bool dequeue)
@@ -303,7 +306,10 @@ vm_pageout_collect_batch(struct scan_state *ss, const bool dequeue)
 	vm_pagequeue_unlock(pq);
 }
 
-/* Return the next page to be scanned, or NULL if the scan is complete. */
+/* Return the next page to be scanned, or NULL if the scan is complete. 
+* Tuli - Jain : Can convert this algorithm to give in order of increasing 
+* frequency and preferring clean pages
+*/
 static __always_inline vm_page_t
 vm_pageout_next(struct scan_state *ss, const bool dequeue)
 {
@@ -1178,6 +1184,19 @@ vm_pageout_scan_active(struct vm_domain *vmd, int page_shortage)
 	 * precedes the second hand in the queue.  When the two hands meet,
 	 * they are moved back to the head and tail of the queue, respectively,
 	 * and scanning resumes.
+	 * 
+	 * Tuli - Jain : Here try to find page_shortage number of least frequency
+	 * 'clean' pages where frequency is below some threshold (need to find 
+	 * emperically) and then move to 'dirty' pages because dirty ones have 
+	 * to be laundered. Currently whichever in scan is got to be clean/dirty
+	 * is freed. The usage of Bloom Filter to efficiently find out those pages
+	 * preferably clean ones to have as close to page_shortage pages to be
+	 * paged out is the contribution of this work.
+	 * 
+	 * To achieve this change the vm_pageout_next algo to go in order of
+	 * least frequently clean pages then least frequent dirty pages. Or if
+	 * that is cumbersome then check frequency using bloom filter and if it 
+	 * is clean and has low frequency then deactivate it
 	 */
 	max_scan = page_shortage > 0 ? pq->pq_cnt : min_scan;
 	mtx = NULL;
@@ -1234,6 +1253,10 @@ act_scan:
 		 * 2) The count was transitioning to one, but we saw zero.
 		 *    This race delays the detection of a new reference.  At
 		 *    worst, we will deactivate and reactivate the page.
+		 * 
+		 *  Tuli - Jain : Used Minimal Counting Bloom Filter to give
+		 *  it's usage frequency so need to update frequency as in
+		 * 	ref_count
 		 */
 		if (m->object->ref_count != 0)
 			act_delta = pmap_ts_referenced(m);
@@ -1279,6 +1302,11 @@ act_scan:
 				 * requirement.  Therefore, we simply rely on
 				 * the opportunistic updates to the page's
 				 * dirty field by the pmap.
+				 * 
+				 * Tuli - Jain : Based on Bloom Filter freq
+				 * we can bypass this laundary overhead by
+				 * directly deactivating pages that are clean 
+				 * and have very low usage frequency 
 				 */
 				if (m->dirty == 0) {
 					vm_page_deactivate(m);
