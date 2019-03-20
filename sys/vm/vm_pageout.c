@@ -114,6 +114,7 @@ __FBSDID("$FreeBSD$");
 #include <vm/swap_pager.h>
 #include <vm/vm_extern.h>
 #include <vm/uma.h>
+#include "counting_bloom.h"
 
 /*
  * System initialization
@@ -131,6 +132,10 @@ SYSINIT(pagedaemon_init, SI_SUB_KTHREAD_PAGE, SI_ORDER_FIRST, vm_pageout_init,
     NULL);
 
 struct proc *pageproc;
+
+// Tuli - Jain - CBF : struct of counting bloom filter
+static struct bloom bloom;
+static int CBF_THRESHOLD = 3;
 
 static struct kproc_desc page_kp = {
 	"pagedaemon",
@@ -1272,13 +1277,17 @@ act_scan:
 		 * Advance or decay the act_count based on recent usage.
 		 */
 		if (act_delta != 0) {
+			// Tuli - Jain - CBF : Add frequency by act_delta
+			bloom_add(&bloom, &m->pindex, 4, act_delta);
 			m->act_count += ACT_ADVANCE + act_delta;
 			if (m->act_count > ACT_MAX)
 				m->act_count = ACT_MAX;
 		} else
 			m->act_count -= min(m->act_count, ACT_DECLINE);
 
-		if (m->act_count <= 1) {
+
+		// Tuli - Jain - CBF : Check frequency is low
+		if (m->act_count == 0 && bloom_check(&bloom, &m->pindex, 4) <= CBF_THRESHOLD) {
 			/*
 			 * When not short for inactive pages, let dirty pages go
 			 * through the inactive queue before moving to the
@@ -2007,6 +2016,9 @@ vm_pageout_init_domain(int domain)
 {
 	struct vm_domain *vmd;
 	struct sysctl_oid *oid;
+	
+	// Tuli - Jain - CBF init
+    bloom_init(&bloom, 10000, 0.1);
 
 	vmd = VM_DOMAIN(domain);
 	vmd->vmd_interrupt_free_min = 2;
