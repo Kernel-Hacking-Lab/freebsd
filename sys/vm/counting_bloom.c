@@ -136,8 +136,3 @@ int bloom_reset(struct bloom * bloom)
   return 0;
 }
 
-
-const char * bloom_version()
-{
-  return MAKESTRING(BLOOM_VERSION);
-}

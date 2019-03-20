@@ -149,14 +149,6 @@ void bloom_free(struct bloom * bloom);
 int bloom_reset(struct bloom * bloom);
 
 
-/** ***************************************************************************
- * Returns version string compiled into library.
- *
- * Return: version string
- *
- */
-const char * bloom_version();
-
 #ifdef __cplusplus
 }
 #endif
