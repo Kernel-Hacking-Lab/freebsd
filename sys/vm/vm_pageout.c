@@ -1278,7 +1278,7 @@ act_scan:
 		} else
 			m->act_count -= min(m->act_count, ACT_DECLINE);
 
-		if (m->act_count == 0) {
+		if (m->act_count <= 1) {
 			/*
 			 * When not short for inactive pages, let dirty pages go
 			 * through the inactive queue before moving to the
