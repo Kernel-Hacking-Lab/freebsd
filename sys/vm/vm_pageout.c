@@ -114,7 +114,7 @@ __FBSDID("$FreeBSD$");
 #include <vm/swap_pager.h>
 #include <vm/vm_extern.h>
 #include <vm/uma.h>
-#include "counting_bloom.h"
+#include <vm/counting_bloom.h>
 
 /*
  * System initialization

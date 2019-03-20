@@ -8,9 +8,8 @@
 #ifndef _COUNTING_BLOOM_H
 #define _COUNTING_BLOOM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifdef _KERNEL
+
 
 
 /** ***************************************************************************
@@ -149,8 +148,6 @@ void bloom_free(struct bloom * bloom);
 int bloom_reset(struct bloom * bloom);
 
 
-#ifdef __cplusplus
-}
 #endif
 
 #endif
